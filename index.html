@@ -2,18 +2,18 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>건강간식 찾기 - Healthy Snack 저당·저나트륨 간식 모음</title>
+<title>건강간식 찾기 — 저당·저나트륨 간식 모음</title>
 <meta name="description" content="당뇨 환자, 노인, 아이 모두를 위한 저당·저나트륨 건강 간식을 모아뒀어요. 100g 기준 당류 10g 이하, 나트륨 200mg 이하 국내산 제품만 선별했어요.">
 <meta name="keywords" content="저당간식, 건강간식, 당뇨간식, 저나트륨, 무당간식, 건강한과자">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://chau-hong.github.io/healthysnack/">
 <meta property="og:title" content="건강간식 찾기 - Healthy Snack">
 <meta property="og:description" content="당뇨 환자, 노인, 아이 모두를 위한 저당·저나트륨 건강 간식을 모아뒀어요.">
-<meta property="og:image" content="https://raw.githubusercontent.com/chau-hong/healthysnack/main/og-image.png">
+<meta property="og:image" content="https://chau-hong.github.io/healthysnack/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="건강간식 찾기 - Healthy Snack">
 <meta name="twitter:description" content="당뇨 환자, 노인, 아이 모두를 위한 저당·저나트륨 건강 간식을 모아뒀어요.">
-<meta name="twitter:image" content="https://raw.githubusercontent.com/chau-hong/healthysnack/main/og-image.png">
+<meta name="twitter:image" content="https://chau-hong.github.io/healthysnack/og-image.png">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
 <style>
   :root{--bg:#fdf6ee;--card-bg:#fffdf9;--accent:#e8622a;--text:#1a1209;--muted:#8b7355;--border:#e8ddd0;--tag-bg:#f0e8dc}
@@ -115,8 +115,8 @@
 </div>
 <div class="about-section">
   <div class="about-text">
-    <p>위암과 당뇨가 있는 할머니의 건강 간식을 찾다가, 같은 고민을 하는 분들에게 도움이 될 것 같아 페이지를 만들었습니다.</p>
-    <p>식품영양성분 데이터베이스를 기반으로 <strong>100g 기준 당류 10g 이하, 나트륨 200mg 이하</strong> 제품 및 국내 제조 제품 위주로 선별하고 있습니다.</p>
+    <p>위암과 당뇨가 있는 할머니의 건강 간식을 찾다가, 같은 고민을 하는 분들에게 도움이 되고자 사이트를 만들었습니다.</p>
+    <p>식품영양성분 DB를 기반으로 <strong>100g 기준 당류 10g 이하, 나트륨 200mg 이하</strong> 및 국내 제조 제품을 가져온 후 여러 기준으로 선별하고 있습니다.</p>
     <div class="about-notice">
       ※ 실제 영양성분은 제품 상세 페이지에서 반드시 확인하세요.<br>
       ※ 이 사이트는 쿠팡 파트너스 활동을 통해 일정 수수료를 받을 수 있습니다.
@@ -125,7 +125,7 @@
 </div>
 <div class="controls">
   <div class="control-group"><label>🔢 정렬</label><div class="sort-btn"><button class="active" data-sort="sugar">당류순</button><button data-sort="calories">칼로리순</button><button data-sort="sodium">나트륨순</button><button data-sort="protein">단백질순</button><button data-sort="name">이름순</button></div></div>
-  <div class="control-group" style="flex-shrink:0"><label>📐 보기</label><div class="grid-toggle"><button id="btn-col1" class="active" title="1열">▬</button><button id="btn-col2" title="2열">⊞</button></div></div>
+  <div class="control-group" style="flex-shrink:0"><label>📐 보기</label><div class="grid-toggle"><button id="btn-col1" title="1열">▬</button><button id="btn-col2" class="active" title="2열">⊞</button></div></div>
 </div>
 <div class="result-info">
   <span id="result-count">불러오는 중...</span>
@@ -178,6 +178,8 @@ function render(){
 }
 document.querySelectorAll('.sort-btn button').forEach(b=>b.addEventListener('click',function(){document.querySelectorAll('.sort-btn button').forEach(x=>x.classList.remove('active'));this.classList.add('active');currentSort=this.dataset.sort;render();}));
 const grid=document.getElementById('grid');
+// 모바일 기본 2열
+if(window.innerWidth<=600) grid.classList.add('cols-2');
 document.getElementById('btn-col1').addEventListener('click',function(){
   grid.classList.remove('cols-2');
   this.classList.add('active');
@@ -188,11 +190,12 @@ document.getElementById('btn-col2').addEventListener('click',function(){
   this.classList.add('active');
   document.getElementById('btn-col1').classList.remove('active');
 });
-// 모바일에서만 토글 표시, 기본 1열
+// 모바일에서만 토글 표시, 기본 2열 버튼 active
 if(window.innerWidth>600){document.querySelector('.grid-toggle').parentElement.style.display='none';}
+else{document.getElementById('btn-col2').classList.add('active');document.getElementById('btn-col1').classList.remove('active');}
 render();
 async function sharePage(){
-  const url=location.href, title='건강간식 찾기 - Healthy Snack';
+  const url=location.href, title='건강간식 찾기 — 저당·저나트륨 간식 모음';
   if(navigator.share){await navigator.share({title,url});}
   else{await navigator.clipboard.writeText(url);alert('링크가 복사됐어요! 원하는 곳에 붙여넣기 하세요.');}
 }
