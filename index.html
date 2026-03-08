@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>건강간식 찾기 — 저당·저나트륨 간식 모음</title>
+<title>건강간식 찾기 - Healthy Snack 저당·저나트륨 간식 모음</title>
 <meta name="description" content="당뇨 환자, 노인, 아이 모두를 위한 저당·저나트륨 건강 간식을 모아뒀어요. 100g 기준 당류 10g 이하, 나트륨 200mg 이하 국내산 제품만 선별했어요.">
 <meta name="keywords" content="저당간식, 건강간식, 당뇨간식, 저나트륨, 무당간식, 건강한과자">
 <meta property="og:type" content="website">
@@ -192,7 +192,7 @@ document.getElementById('btn-col2').addEventListener('click',function(){
 if(window.innerWidth>600){document.querySelector('.grid-toggle').parentElement.style.display='none';}
 render();
 async function sharePage(){
-  const url=location.href, title='건강간식 찾기 — 저당·저나트륨 간식 모음';
+  const url=location.href, title='건강간식 찾기 - Healthy Snack';
   if(navigator.share){await navigator.share({title,url});}
   else{await navigator.clipboard.writeText(url);alert('링크가 복사됐어요! 원하는 곳에 붙여넣기 하세요.');}
 }
