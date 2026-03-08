@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>저당 간식 찾기</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#fdf6ee;--card-bg:#fffdf9;--accent:#e8622a;--text:#1a1209;--muted:#8b7355;--border:#e8ddd0;--tag-bg:#f0e8dc}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+  header{background:var(--text);padding:22px 40px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+  .logo-main{font-family:'DM Serif Display',serif;font-size:24px;color:#fdf6ee}
+  .logo-sub{font-size:11px;color:#8b7355;font-weight:300;letter-spacing:2px;text-transform:uppercase;margin-left:10px}
+  .header-badge{background:var(--accent);color:white;font-size:11px;font-weight:700;padding:5px 14px;border-radius:20px}
+  .hero{background:var(--text);padding:44px 40px 52px;text-align:center;position:relative;overflow:hidden}
+  .hero::before{content:'';position:absolute;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(232,98,42,0.15) 0%,transparent 70%);top:-100px;right:-100px}
+  .hero-eyebrow{font-size:11px;font-weight:700;letter-spacing:4px;color:var(--accent);text-transform:uppercase;margin-bottom:14px}
+  .hero-title{font-family:'DM Serif Display',serif;font-size:clamp(32px,5vw,52px);color:#fdf6ee;line-height:1.15;margin-bottom:14px}
+  .hero-title em{font-style:italic;color:var(--accent)}
+  .hero-desc{font-size:14px;color:#8b7355;font-weight:300;max-width:500px;margin:0 auto 30px;line-height:1.7}
+  .hero-stats{display:flex;justify-content:center;gap:40px}
+  .stat-num{font-family:'DM Serif Display',serif;font-size:30px;color:#fdf6ee}
+  .stat-label{font-size:10px;color:#8b7355;letter-spacing:1px;text-transform:uppercase}
+  .controls{padding:24px 40px;background:var(--card-bg);border-bottom:1px solid var(--border);display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end}
+  .control-group{display:flex;flex-direction:column;gap:5px;min-width:170px}
+  .control-group.grow{flex:1}
+  label{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
+  input[type="text"],select{height:42px;border:1.5px solid var(--border);border-radius:8px;padding:0 12px;font-family:'Noto Sans KR',sans-serif;font-size:13px;background:var(--bg);color:var(--text);outline:none;width:100%;transition:border-color .2s}
+  input[type="text"]:focus,select:focus{border-color:var(--accent)}
+  .range-wrapper{display:flex;align-items:center;gap:10px}
+  input[type="range"]{flex:1;-webkit-appearance:none;height:4px;background:linear-gradient(to right,var(--accent) 0%,var(--accent) var(--pct,100%),var(--border) var(--pct,100%));border-radius:2px;outline:none;cursor:pointer}
+  input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--accent);box-shadow:0 2px 8px rgba(232,98,42,0.4);cursor:pointer}
+  .range-val{font-size:13px;font-weight:700;color:var(--accent);min-width:52px;text-align:right}
+  .sort-btn{display:flex;gap:5px;flex-wrap:wrap}
+  .sort-btn button{height:34px;padding:0 13px;border:1.5px solid var(--border);border-radius:20px;background:transparent;font-family:'Noto Sans KR',sans-serif;font-size:12px;font-weight:500;color:var(--muted);cursor:pointer;transition:all .2s;white-space:nowrap}
+  .sort-btn button.active,.sort-btn button:hover{background:var(--text);color:#fdf6ee;border-color:var(--text)}
+  .result-info{padding:14px 40px;font-size:12px;color:var(--muted);background:var(--bg);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+  .result-info strong{color:var(--accent)}
+  .filter-notice{padding:10px 40px;background:#fff8f5;border-bottom:1px solid #f5d9cc;font-size:11px;color:#a05030;display:flex;align-items:center;gap:6px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:18px;padding:24px 40px 60px;max-width:1400px;margin:0 auto}
+  .card{background:var(--card-bg);border:1.5px solid var(--border);border-radius:16px;overflow:hidden;display:flex;flex-direction:column;transition:all .25s cubic-bezier(0.34,1.56,0.64,1)}
+  .card:hover{transform:translateY(-4px);box-shadow:0 16px 40px rgba(26,18,9,0.13);border-color:var(--accent)}
+  .card-top-bar{height:4px;width:100%;flex-shrink:0}
+  .card-body{padding:18px;flex:1;display:flex;flex-direction:column;gap:11px}
+  .card-header-row{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+  .card-name{font-size:14px;font-weight:700;line-height:1.4;flex:1}
+  .sugar-badge{flex-shrink:0;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700}
+  .card-brand{font-size:11px;color:var(--muted);font-weight:300}
+  .flavor-wrap{display:flex;flex-wrap:wrap;gap:4px}
+  .flavor-tag{font-size:11px;font-weight:500;background:var(--tag-bg);color:var(--muted);padding:3px 9px;border-radius:20px;border:1px solid var(--border)}
+  .flavor-more{font-size:11px;font-weight:700;background:var(--text);color:#fdf6ee;padding:3px 9px;border-radius:20px}
+  .nutrition{display:flex;flex-direction:column;gap:7px}
+  .nutr-row{display:flex;align-items:center;gap:8px}
+  .nutr-label{font-size:11px;color:var(--muted);width:44px;flex-shrink:0}
+  .nutr-bar-wrap{flex:1;height:5px;background:var(--tag-bg);border-radius:3px;overflow:hidden}
+  .nutr-bar{height:100%;border-radius:3px}
+  .nutr-val{font-size:11px;font-weight:600;min-width:44px;text-align:right;color:var(--text)}
+  .card-footer{margin-top:auto;padding-top:12px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .kcal{font-family:'DM Serif Display',serif;font-size:20px}
+  .kcal span{font-size:10px;font-family:'Noto Sans KR',sans-serif;color:var(--muted)}
+  .coupang-btn{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;background:var(--accent);color:white;padding:7px 14px;border-radius:20px;text-decoration:none;white-space:nowrap;flex-shrink:0;transition:opacity .2s}
+  .coupang-btn:hover{opacity:.82}
+  .empty{grid-column:1/-1;text-align:center;padding:80px 20px;color:var(--muted)}
+  .empty-icon{font-size:48px;margin-bottom:16px}
+  .empty-title{font-family:'DM Serif Display',serif;font-size:24px;color:var(--text);margin-bottom:8px}
+  @media(max-width:600px){header,.controls,.result-info,.filter-notice{padding:14px 16px}.grid{padding:16px;gap:12px}.hero{padding:32px 16px 36px}.hero-stats{gap:20px}}
+</style>
+</head>
+<body>
+<header>
+  <div><span class="logo-main">건강간식 찾기</span><span class="logo-sub">Healthy Snack Finder</span></div>
+</header>
+<div class="hero">
+  <div class="hero-eyebrow">가공식품 영양성분 데이터베이를 바탕으로 엄선한</div>
+  <h1 class="hero-title">건강한 간식,<br><em>바로 구매해보세요</h1>
+  <p class="hero-desc">당뇨 환자, 부모님, 아이, 가족 모두를 위한 저당·저나트륨 간식을<br>쿠팡에서 바로 구매하세요.</p>
+  <div class="hero-stats">
+    <div class="stat"><div class="stat-num" id="total-count">-</div><div class="stat-label">총 상품 수</div></div>
+    <div class="stat"><div class="stat-num" id="zero-count">-</div><div class="stat-label">무당 간식</div></div>
+    <div class="stat"><div class="stat-num" id="low-count">-</div><div class="stat-label">저당 3g 미만</div></div>
+  </div>
+</div>
+<div class="filter-notice">🚫 <span>"이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다."</span></div>
+<div class="controls">
+  <div class="control-group grow"><label>🔍 간식 이름 검색</label><input type="text" id="search" placeholder="예: 쌀스틱, 뻥튀기, 쿠키..."/></div>
+  <div class="control-group"><label>🏭 제조사</label><select id="brand-filter"><option value="">전체 제조사</option></select></div>
+  <div class="control-group" style="min-width:220px"><label>🍬 최대 당류 (1회 섭취량 기준)</label><div class="range-wrapper"><input type="range" id="sugar-max" min="0" max="3" step="0.5" value="3"/><div class="range-val" id="sugar-display">전체</div></div></div>
+  <div class="control-group"><label>🔢 정렬</label><div class="sort-btn"><button class="active" data-sort="sugar">당류순</button><button data-sort="calories">칼로리순</button><button data-sort="sodium">나트륨순</button><button data-sort="protein">단백질순</button><button data-sort="name">이름순</button></div></div>
+</div>
+<div class="result-info">
+  <span id="result-count">불러오는 중...</span>
+  <span style="font-size:11px">최근 업데이트: 2026-03-08</span>
+</div>
+<div class="grid" id="grid"></div>
+<script>
+const SNACKS=[{"id": ["MANUAL-001"], "name": "국산 기름제로 현미칩", "brand": "푸디스", "calories": 393.0, "sugar_per_serving": 0.78, "carbs": 88.7, "sodium": 123.8, "fat": 0.8, "protein": 7.8, "serving_size": "60g", "flavors": ["현미", "와사비"], "variant_count": 1, "added_at": "2026-03-08 00:00:00"}, {"id": ["MANUAL-002"], "name": "기름제로 옥수수칩", "brand": "푸디스", "calories": 388.3, "sugar_per_serving": 0.24, "carbs": 84.3, "sodium": 106.8, "fat": 2.1, "protein": 8.0, "serving_size": "60g", "flavors": ["옥수수"], "variant_count": 1, "added_at": "2026-03-08 00:00:00"}, {"id": ["P101-106000100-6183", "P101-106000100-6182"], "name": "미소다 자일리톨뿌링", "brand": "올바름", "calories": 355.0, "sugar_per_serving": 0.0, "carbs": 75.0, "sodium": 0.0, "fat": 3.1, "protein": 9.0, "serving_size": "30g", "flavors": ["단호박", "시금치"], "variant_count": 2, "added_at": "2026-03-08 03:27:24"}, {"id": ["P101-106000100-1075", "P101-106000100-1076", "P101-106000100-1072", "P101-106000100-1078", "P101-106000100-1074", "P101-106000100-1077", "P101-106000100-1073"], "name": "스스로스틱", "brand": "아이누리", "calories": 400.0, "sugar_per_serving": 0.0, "carbs": 83.27, "sodium": 0.0, "fat": 3.18, "protein": 8.57, "serving_size": "30g", "flavors": ["딸기", "사과", "녹황채소", "당근", "브로콜리", "시금치", "자색고구마", "콜라비", "표고"], "variant_count": 7, "added_at": "2026-03-08 03:27:24"}, {"id": ["P101-106000100-0804", "P101-106000100-0805"], "name": "베이비잇쌀과자스틱", "brand": "주식회사오늘도", "calories": 400.0, "sugar_per_serving": 0.0, "carbs": 80.0, "sodium": 0.0, "fat": 3.2, "protein": 8.0, "serving_size": "30g", "flavors": ["감귤", "단호박", "고구마"], "variant_count": 2, "added_at": "2026-03-08 03:27:24"}, {"id": ["P101-106000100-0806", "P101-106000100-0807", "P101-106000100-0808"], "name": "베이비잇쌀과자팝", "brand": "주식회사오늘도", "calories": 400.0, "sugar_per_serving": 0.0, "carbs": 84.0, "sodium": 0.0, "fat": 3.07, "protein": 8.0, "serving_size": "30g", "flavors": ["단호박", "자색고구마", "현미"], "variant_count": 3, "added_at": "2026-03-08 03:27:24"}, {"id": ["P101-106000100-0842", "P101-106000100-0844", "P101-106000100-0845"], "name": "봉봉스틱", "brand": "주식회사오늘도", "calories": 400.0, "sugar_per_serving": 0.0, "carbs": 82.67, "sodium": 0.0, "fat": 3.33, "protein": 8.0, "serving_size": "30g", "flavors": ["사과당근", "양파", "흑미"], "variant_count": 3, "added_at": "2026-03-08 03:27:24"}, {"id": ["P101-106000100-0851", "P101-106000100-0849", "P101-106000100-0850", "P101-106000100-0847", "P101-106000100-0846", "P101-106000100-0848"], "name": "봉봉팝", "brand": "주식회사오늘도", "calories": 400.0, "sugar_per_serving": 0.0, "carbs": 83.33, "sodium": 0.0, "fat": 3.33, "protein": 8.0, "serving_size": "30g", "flavors": ["감귤", "단호박", "사과당근", "양파", "자색고구마", "현미"], "variant_count": 6, "added_at": "2026-03-08 03:27:24"}, {"id": ["P101-106000100-0943"], "name": "에코맘의산골이유식산골쌀참", "brand": "주식회사이음새농업회사법인", "calories": 400.0, "sugar_per_serving": 0.0, "carbs": 80.0, "sodium": 0.0, "fat": 4.4, "protein": 8.0, "serving_size": "30g", "flavors": ["사과/당근", "시금치", "자색고구마"], "variant_count": 1, "added_at": "2026-03-08 03:27:24"}, {"id": ["P101-106000100-1041"], "name": "순수단호박링", "brand": "아이누리", "calories": 400.0, "sugar_per_serving": 0.0, "carbs": 82.5, "sodium": 0.0, "fat": 4.0, "protein": 7.5, "serving_size": "30g", "flavors": [], "variant_count": 1, "added_at": "2026-03-08 03:27:24"}, {"id": ["P101-106000100-1049"], "name": "순수현미링", "brand": "아이누리", "calories": 400.0, "sugar_per_serving": 0.0, "carbs": 85.0, "sodium": 0.0, "fat": 3.25, "protein": 7.5, "serving_size": "30g", "flavors": [], "variant_count": 1, "added_at": "2026-03-08 03:27:24"}, {"id": ["P101-106000100-2854", "P101-106000100-2853"], "name": "우아쌀스틱", "brand": "그린원푸드", "calories": 385.0, "sugar_per_serving": 0.0, "carbs": 82.5, "sodium": 0.0, "fat": 3.0, "protein": 7.5, "serving_size": "30g", "flavors": ["단호박맛", "자색고구마맛"], "variant_count": 2, "added_at": "2026-03-08 03:27:24"}, {"id": ["P101-106000100-3371"], "name": "현미킥", "brand": "(주)오그래농업회사법인", "calories": 360.0, "sugar_per_serving": 0.0, "carbs": 82.5, "sodium": 0.0, "fat": 3.0, "protein": 7.5, "serving_size": "30g", "flavors": [], "variant_count": 1, "added_at": "2026-03-08 03:27:24"}, {"id": ["P101-106000100-1185"], "name": "아이보리단호박쌀과자", "brand": "아이보리식품영농조합법인", "calories": 400.0, "sugar_per_serving": 0.0, "carbs": 90.0, "sodium": 0.0, "fat": 0.0, "protein": 7.0, "serving_size": "30g", "flavors": [], "variant_count": 1, "added_at": "2026-03-08 03:27:24"}, {"id": ["P101-106000100-0596", "P101-106000100-0600", "P101-106000100-0598", "P101-106000100-0595", "P101-106000100-0599", "P101-106000100-0597"], "name": "리틀스푼유기농백미떡뻥", "brand": "(주)더하이", "calories": 400.0, "sugar_per_serving": 0.0, "carbs": 89.58, "sodium": 0.0, "fat": 0.46, "protein": 6.75, "serving_size": "30g", "flavors": ["쌀눈", "단호박", "바나나", "백미", "브로콜리", "사과", "자색고구마"], "variant_count": 6, "added_at": "2026-03-08 03:27:24"}, {"id": ["P101-106000100-0604", "P101-106000100-0602"], "name": "리틀스푼유기농현미스틱", "brand": "(주)더하이", "calories": 405.0, "sugar_per_serving": 0.0, "carbs": 85.25, "sodium": 0.0, "fat": 3.38, "protein": 6.75, "serving_size": "30g", "flavors": ["쌀눈", "자색고구마", "현미"], "variant_count": 2, "added_at": "2026-03-08 03:27:24"}, {"id": ["P101-106000100-0834", "P101-106000100-0833", "P101-106000100-0835"], "name": "본유기농쌀과자떡뻥", "brand": "(주)더하이", "calories": 400.0, "sugar_per_serving": 0.0, "carbs": 87.78, "sodium": 0.0, "fat": 0.89, "protein": 6.67, "serving_size": "30g", "flavors": ["쌀눈", "단호박", "백미", "사과"], "variant_count": 3, "added_at": "2026-03-08 03:27:24"}, {"id": ["P101-106000100-0837", "P101-106000100-0836", "P101-106000100-0838"], "name": "본유기농쌀과자스틱", "brand": "(주)더하이", "calories": 405.67, "sugar_per_serving": 0.0, "carbs": 85.56, "sodium": 0.0, "fat": 3.45, "protein": 6.67, "serving_size": "30g", "flavors": ["쌀눈", "브로콜리", "자색고구마", "현미"], "variant_count": 3, "added_at": "2026-03-08 03:27:24"}, {"id": ["P101-106000100-1469", "P101-106000100-1468"], "name": "유기농떡뻥", "brand": "아이누리", "calories": 400.0, "sugar_per_serving": 0.0, "carbs": 86.67, "sodium": 16.5, "fat": 1.0, "protein": 6.67, "serving_size": "30g", "flavors": ["백미", "치즈"], "variant_count": 2, "added_at": "2026-03-08 03:27:24"}, {"id": ["P101-106000100-1471", "P101-106000100-1470"], "name": "유기농라이스팝", "brand": "진터식품", "calories": 403.5, "sugar_per_serving": 0.0, "carbs": 86.67, "sodium": 0.0, "fat": 0.0, "protein": 6.67, "serving_size": "30g", "flavors": ["단호박", "브로콜리", "자색고구마", "바나나", "블루베리", "비트"], "variant_count": 2, "added_at": "2026-03-08 03:27:24"}, {"id": ["P101-106000100-1629", "P101-106000100-1633", "P101-106000100-1632", "P101-106000100-1638", "P101-106000100-1631", "P101-106000100-1637", "P101-106000100-1635", "P101-107000100-0073", "P101-106000100-1634", "P101-106000100-1636", "P101-106000100-1630"], "name": "지후떡뻥", "brand": "지후쌀과자", "calories": 364.0, "sugar_per_serving": 0.0, "carbs": 82.77, "sodium": 0.0, "fat": 0.0, "protein": 6.29, "serving_size": "30g", "flavors": ["단호박", "당근", "바나나", "배", "백미", "비트", "사과", "시금치", "양파", "자색고구마"], "variant_count": 11, "added_at": "2026-03-08 03:27:24"}, {"id": ["P101-106000100-1697", "P101-106000100-1695", "P101-106000100-1696"], "name": "처음먹는 빼빼롱뻥", "brand": "㈜오늘도", "calories": 390.0, "sugar_per_serving": 0.0, "carbs": 83.33, "sodium": 0.0, "fat": 3.33, "protein": 6.67, "serving_size": "30g", "flavors": ["단호박", "사과", "자색고구마"], "variant_count": 3, "added_at": "2026-03-08 03:27:24"}, {"id": ["P101-106000100-3760", "P101-106000100-3762", "P101-106000100-3761"], "name": "키우키우 유기농 쌀스틱", "brand": "주식회사이음새농업회사법인", "calories": 379.0, "sugar_per_serving": 0.0, "carbs": 83.33, "sodium": 0.0, "fat": 1.56, "protein": 7.78, "serving_size": "30g", "flavors": ["사과당근", "자색고구마", "유자"], "variant_count": 3, "added_at": "2026-03-08 03:27:24"}, {"id": ["P101-107000100-0301", "P101-107000100-0302"], "name": "힐로우 약과", "brand": "꼬랑지마카롱", "calories": 494.0, "sugar_per_serving": 0.0, "carbs": 52.94, "sodium": 0.0, "fat": 29.41, "protein": 5.88, "serving_size": "30g", "flavors": ["단호박", "쑥맛"], "variant_count": 2, "added_at": "2026-03-08 03:27:24"}, {"id": ["P101-106000100-0939", "P101-106000100-0941", "P101-106000100-0937"], "name": "에코맘의산골이유식산골떡뻥", "brand": "주식회사이음새농업회사법인", "calories": 400.0, "sugar_per_serving": 0.0, "carbs": 90.0, "sodium": 0.0, "fat": 0.0, "protein": 5.0, "serving_size": "30g", "flavors": ["단호박", "백미", "쌀눈", "사과"], "variant_count": 3, "added_at": "2026-03-08 03:27:24"}, {"id": ["P101-106000100-0681"], "name": "들깨바5.6", "brand": "다현에프앤비(F&B)", "calories": 548.0, "sugar_per_serving": 0.0, "carbs": 40.0, "sodium": 0.0, "fat": 36.0, "protein": 28.0, "serving_size": "30g", "flavors": [], "variant_count": 1, "added_at": "2026-03-08 03:27:24"}, {"id": ["P101-106000100-4098"], "name": "귀리바5.6", "brand": "다현에프앤비(F&B)", "calories": 308.0, "sugar_per_serving": 0.0, "carbs": 32.0, "sodium": 0.0, "fat": 4.0, "protein": 24.0, "serving_size": "30g", "flavors": [], "variant_count": 1, "added_at": "2026-03-08 03:27:24"}, {"id": ["P101-106000100-0680"], "name": "넛츠바5.6", "brand": "다현에프앤비(F&B)", "calories": 600.0, "sugar_per_serving": 0.0, "carbs": 30.0, "sodium": 0.0, "fat": 43.33, "protein": 16.67, "serving_size": "30g", "flavors": ["카카오닙스"], "variant_count": 1, "added_at": "2026-03-08 03:27:24"}, {"id": ["P101-106000100-4274", "P101-106000100-4273"], "name": "파머스팬트리 국산 유기농 쌀과자 떡뻥", "brand": "주식회사이음새농업회사법인", "calories": 389.0, "sugar_per_serving": 0.0, "carbs": 84.44, "sodium": 0.0, "fat": 0.0, "protein": 11.11, "serving_size": "30g", "flavors": ["자색고구마쌀송이", "현미쌀송이"], "variant_count": 2, "added_at": "2026-03-08 03:27:24"}, {"id": ["P101-106000100-0456"], "name": "ORGA동물원에간유기농현미스낵", "brand": "(주)해오름식품", "calories": 417.0, "sugar_per_serving": 0.0, "carbs": 83.33, "sodium": 0.0, "fat": 4.0, "protein": 10.0, "serving_size": "30g", "flavors": [], "variant_count": 1, "added_at": "2026-03-08 03:27:24"}, {"id": ["P101-106000100-0236"], "name": "길쭉이사과쌀과자", "brand": "맘스쌀과자", "calories": 407.0, "sugar_per_serving": 0.0, "carbs": 83.33, "sodium": 15.0, "fat": 3.67, "protein": 10.0, "serving_size": "30g", "flavors": [], "variant_count": 1, "added_at": "2026-03-08 03:27:24"}, {"id": ["P101-106000100-1898"], "name": "퓨어잇떡뻥쌀과자", "brand": "농업회사법인한세상(주)", "calories": 400.0, "sugar_per_serving": 0.0, "carbs": 86.67, "sodium": 17.0, "fat": 2.0, "protein": 8.0, "serving_size": "30g", "flavors": ["바나나", "사과", "당근", "시금치", "자색고구마", "양파", "양배추", "백미"], "variant_count": 1, "added_at": "2026-03-08 03:27:24"}];
+const brands=[...new Set(SNACKS.map(s=>s.brand).filter(b=>b&&b!=='해당없음'))].sort();
+const brandSel=document.getElementById('brand-filter');
+brands.forEach(b=>{const o=document.createElement('option');o.value=b;o.textContent=b;brandSel.appendChild(o);});
+document.getElementById('total-count').textContent=SNACKS.length;
+document.getElementById('zero-count').textContent=SNACKS.filter(s=>(s.sugar_per_serving||0)===0).length;
+document.getElementById('low-count').textContent=SNACKS.filter(s=>(s.sugar_per_serving||0)<3).length;
+let currentSort='sugar';
+const sugarStyle=g=>g<=0?{color:'#2a7e5e',bg:'#e8f5ef',label:'무당'}:g<3?{color:'#2a7e5e',bg:'#e8f5ef',label:g.toFixed(1)+'g'}:{color:'#c47a1a',bg:'#fff4e8',label:g.toFixed(1)+'g'};
+const barColor=l=>({'당류':'#e8622a','탄수':'#c47a1a','단백질':'#2a7e5e','지방':'#8b6ead','나트륨':'#5b7fbf'}[l]||'#8b7355');
+const dlCache={};
+async function getCoupangLink(name){
+  if(dlCache[name])return dlCache[name];
+  dlCache[name]='loading';
+  dlCache[name]='https://www.coupang.com/np/search?q='+encodeURIComponent(name)+'&lptag=AF1947671';
+  return dlCache[name];
+}
+function renderCard(s){
+  const sugar=s.sugar_per_serving??0,sc=sugarStyle(sugar),brand=(s.brand&&s.brand!=='해당없음')?s.brand:'제조사 미상';
+  const id='c'+Math.random().toString(36).slice(2);
+  const flavHtml=s.flavors?.length?`<div class="flavor-wrap">${s.flavors.slice(0,4).map(f=>`<span class="flavor-tag">${f}</span>`).join('')}${s.flavors.length>4?`<span class="flavor-more">+${s.flavors.length-4}개</span>`:''}</div>`:'';
+  const nutr=[['당류',sugar,3,'g'],['탄수',s.carbs||0,90,'g'],['단백질',s.protein||0,30,'g'],['지방',s.fat||0,30,'g'],['나트륨',s.sodium||0,200,'mg']];
+  const nutrHtml=nutr.map(([l,v,mx,u])=>`<div class="nutr-row"><span class="nutr-label">${l}</span><div class="nutr-bar-wrap"><div class="nutr-bar" style="width:${Math.min(100,v/mx*100).toFixed(1)}%;background:${barColor(l)}"></div></div><span class="nutr-val">${v.toFixed(1)}<span style="font-weight:300;color:var(--muted);font-size:9px">${u}</span></span></div>`).join('');
+  const fb='https://www.coupang.com/np/search?q='+encodeURIComponent(s.name)+'&lptag=AF1947671';
+  setTimeout(async()=>{const b=document.getElementById(id);if(b)b.href=await getCoupangLink(s.name);},0);
+  const vb=s.variant_count>1?`<span style="font-size:10px;color:var(--muted);margin-left:4px">(${s.variant_count}종)</span>`:'';
+  return`<div class="card"><div class="card-top-bar" style="background:${sc.color}"></div><div class="card-body"><div class="card-header-row"><div class="card-name">${s.name}${vb}</div><div class="sugar-badge" style="background:${sc.bg};color:${sc.color}">${sc.label}</div></div><div class="card-brand">🏭 ${brand} &nbsp;·&nbsp; 1회 ${s.serving_size||'30g'}</div>${flavHtml}<div class="nutrition">${nutrHtml}</div><div class="card-footer"><div class="kcal">${Math.round(s.calories||0)} <span>kcal/100g</span></div><a id="${id}" class="coupang-btn" href="${fb}" target="_blank" rel="noopener">쿠팡 검색 →</a></div></div></div>`;
+}
+function render(){
+  const q=document.getElementById('search').value.toLowerCase().trim();
+  const ms=parseFloat(document.getElementById('sugar-max').value);
+  const br=document.getElementById('brand-filter').value;
+  let f=SNACKS.filter(s=>{
+    if(q&&!s.name.toLowerCase().includes(q)&&!(s.flavors||[]).some(x=>x.toLowerCase().includes(q)))return false;
+    if((s.sugar_per_serving??0)>ms)return false;
+    if(br&&s.brand!==br)return false;
+    return true;
+  });
+  if(currentSort==='sugar')f.sort((a,b)=>(a.sugar_per_serving||0)-(b.sugar_per_serving||0));
+  else if(currentSort==='calories')f.sort((a,b)=>(a.calories||0)-(b.calories||0));
+  else if(currentSort==='sodium')f.sort((a,b)=>(a.sodium||0)-(b.sodium||0));
+  else if(currentSort==='protein')f.sort((a,b)=>(b.protein||0)-(a.protein||0));
+  else if(currentSort==='name')f.sort((a,b)=>a.name.localeCompare(b.name));
+  document.getElementById('result-count').innerHTML=`총 <strong>${f.length}</strong>개 상품`;
+  const grid=document.getElementById('grid');
+  if(!f.length){grid.innerHTML=`<div class="empty"><div class="empty-icon">🔍</div><div class="empty-title">검색 결과가 없어요</div><p>조건을 조정해 다시 검색해 보세요</p></div>`;return;}
+  grid.innerHTML=f.map(renderCard).join('');
+}
+const sr=document.getElementById('sugar-max');
+function updateRange(){const v=parseFloat(sr.value);sr.style.setProperty('--pct',(v/3*100)+'%');document.getElementById('sugar-display').textContent=v===0?'0g (무당만)':v>=3?'전체':v+'g 이하';render();}
+sr.addEventListener('input',updateRange);updateRange();
+document.getElementById('search').addEventListener('input',render);
+document.getElementById('brand-filter').addEventListener('change',render);
+document.querySelectorAll('.sort-btn button').forEach(b=>b.addEventListener('click',function(){document.querySelectorAll('.sort-btn button').forEach(x=>x.classList.remove('active'));this.classList.add('active');currentSort=this.dataset.sort;render();}));
+render();
+</script>
+</body>
+</html>
